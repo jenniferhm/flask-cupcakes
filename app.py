@@ -1,6 +1,6 @@
 """Flask app for Cupcakes"""
 
-from flask import Flask, flash, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Cupcake
@@ -14,22 +14,16 @@ connect_db(app)
 db.create_all()
 
 app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
-
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
 
-def serialize_cupcake(cupcake):
-    """Serializing cupcake."""
+@app.route('/')
+def index():
+    """ Display form to add cupcakes. """
 
-    return {
-        "id": cupcake.id,
-        "flavor": cupcake.flavor,
-        "size": cupcake.size,
-        "rating": cupcake.rating,
-        "image": cupcake.image
-    }
+    return render_template('index.html')
 
 
 @app.route("/api/cupcakes")
@@ -38,7 +32,7 @@ def get_cupcakes():
     Should return JSON {cupcakes: [{id, flavor, size, rating, image}, ...]}."""
 
     cupcakes = Cupcake.query.all()
-    serialized = [serialize_cupcake(c) for c in cupcakes]
+    serialized = [c.serialize() for c in cupcakes]
 
     return jsonify(cupcakes=serialized)
 
@@ -49,7 +43,7 @@ def get_cupcake(cupcake_id):
     Should return JSON {cupcake: {id, flavor, size, rating, image}}."""
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
-    serialized = serialize_cupcake(cupcake)
+    serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
 
@@ -64,11 +58,44 @@ def create_cupcake():
     new_cupcake.flavor = request.json["flavor"]
     new_cupcake.size = request.json["size"]
     new_cupcake.rating = request.json["rating"]
-    new_cupcake.image = request.json["image"]
+    new_cupcake.image = request.json.get("image") or None
 
     db.session.add(new_cupcake)
     db.session.commit()
 
-    serialized = serialize_cupcake(new_cupcake)
+    serialized = new_cupcake.serialize()
 
     return (jsonify(cupcake=serialized), 201)
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
+def update_cupcake(cupcake_id):
+    """Update an existing cupcake.
+    Should return JSON {cupcake: {id, flavor, size, rating, image}}."""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = request.json["flavor"]
+    cupcake.size = request.json["size"]
+    cupcake.rating = request.json["rating"]
+    cupcake.image = request.json["image"]
+
+    db.session.add(cupcake)
+    db.session.commit()
+
+    serialized = cupcake.serialize()
+
+    return jsonify(cupcake=serialized)
+
+
+@app.route('/api/cupcakes/<int:cupcake_id>', methods=["DELETE"])
+def delete_cupcake(cupcake_id):
+    """Delete an existing cupcake.
+       Should return JSON {message: "Deleted"}."""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    db.session.delete(cupcake)
+    db.session.commit()
+
+    return jsonify(message="Deleted")

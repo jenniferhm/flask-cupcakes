@@ -51,6 +51,7 @@ class CupcakeViewsTestCase(TestCase):
 
         db.session.rollback()
 
+    """ GET ALL CUPCAKES TEST """
     def test_list_cupcakes(self):
         with app.test_client() as client:
             resp = client.get("/api/cupcakes")
@@ -70,6 +71,7 @@ class CupcakeViewsTestCase(TestCase):
                 ]
             })
 
+    """ GET 1 CUPCAKE TEST """
     def test_get_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
@@ -87,6 +89,15 @@ class CupcakeViewsTestCase(TestCase):
                 }
             })
 
+    """ GET 1 CUPCAKE 404 TEST """
+    def test_get_cupcake_404(self):
+        with app.test_client() as client:
+            url = "/api/cupcakes/9827394827"
+            resp = client.get(url)
+
+            self.assertEqual(resp.status_code, 404)
+
+    """ POST TEST """
     def test_create_cupcake(self):
         with app.test_client() as client:
             url = "/api/cupcakes"
@@ -110,3 +121,56 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    """ PATCH TEST """
+    def test_patch_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 200)
+
+            data = resp.json
+
+            # don't know what ID we'll get, make sure it's an int & normalize
+            self.assertIsInstance(data['cupcake']['id'], int)
+            del data['cupcake']['id']
+
+            self.assertEqual(data, {
+                "cupcake": {
+                    "flavor": "TestFlavor2",
+                    "size": "TestSize2",
+                    "rating": 10,
+                    "image": "http://test.com/cupcake2.jpg"
+                }
+            })
+
+            self.assertEqual(Cupcake.query.count(), 1)
+
+    """ PATCH 404 TEST """
+    def test_patch_cupcake_404(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/20987398234"
+            resp = client.patch(url, json=CUPCAKE_DATA_2)
+
+            self.assertEqual(resp.status_code, 404)
+
+    """ DELETE TEST """
+    def test_delete_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake.id}"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+            data = resp.json
+            self.assertEqual(data, {
+                "message": "Deleted"
+            })
+
+    """ DELETE TEST """
+    def test_delete_cupcake_404(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/198273944"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)

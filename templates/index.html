@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Add a Cupcake</title>
+</head>
+<body>
+    
+    <div class="container text-center mt-5">
+        <form id="search_form">
+            <label for="search_flavor">Search by Flavor</label>
+            <input type="text" name="search_flavor" id="search_flavor">
+            <input type="submit" value="Search">
+        </form>
+    </div>
+
+    <div class="container text-center" id="cupcakes-list">
+        <h2>Cupcakes:</h2>
+    </div>
+
+    <div class="container text-center mt-5">
+        <form id="new-cup-form">
+            <div class="form-group">
+                <label for="flavor">Flavor</label>
+                <input type="text" name="flavor" id="flavor">
+            </div>
+            <div class="form-group">
+                <label for="size">Size</label>
+                <input type="text" name="size" id="size">
+            </div>
+            <div class="form-group">
+                <label for="rating">Rating</label>
+                <input type="number" name="rating" id="rating">
+            </div>
+            <div class="form-group">
+                <label for="image">Image</label>
+                <input type="text" name="image" id="image">
+            </div>
+                <input type="submit" value="Add Cupcake">
+        </form>
+    </div>
+    
+    
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+<script src="/static/scripts.js"></script>
+</body>
+</html>
